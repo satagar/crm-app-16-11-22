@@ -1,7 +1,7 @@
 const app = require("../index")
 const supertest = require("supertest")
 
-describe("Test the root path", () => {
+xdescribe("Test the root path", () => {
     test("It should response the GET method", async () => {
         await supertest(app)
             .get("/")
