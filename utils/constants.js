@@ -6,5 +6,6 @@ exports.userTypes = {
 
 exports.userStatus = {
     approved: 'APPROVED',
-    pending: 'PENDING'
+    pending: 'PENDING',
+    rejected: 'REJECTED'
 }
