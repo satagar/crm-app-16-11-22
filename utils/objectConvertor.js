@@ -13,3 +13,10 @@ exports.userResponse = (users) => {
     return usersResult;
 
 }
+
+exports.ticketConvertor = (ticket) => {
+    return {
+        title: ticket.title,
+        ticketPriority: ticket.ticketPriority
+    }
+}

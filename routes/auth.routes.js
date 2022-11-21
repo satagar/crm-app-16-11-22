@@ -3,6 +3,7 @@ const verifySignup = require('../middlewares/signup.middleware');
 const findAllController = require('../controllers/findAll.controller');
 const findByIdController = require('../controllers/findById.controller');
 const updateController = require('../controllers/update.controller');
+const ticketController = require('../controllers/ticket.controller');
 const validator = require('../utils/validateToken');
 const {isAdmin} = require('../utils/isAdmin');
 
@@ -22,6 +23,8 @@ module.exports = function(router){
     router.get("/crm/api/v1/users/:userId", validator.verifyToken, isAdmin, findByIdController.findById);
 
     router.put("/crm/api/v1/users/:userId", validator.verifyToken, isAdmin, updateController.update);
+
+    router.post("/crm/api/v1/tickets", validator.verifyToken, ticketController.createTicket);
 
 }
 
