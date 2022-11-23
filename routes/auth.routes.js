@@ -6,6 +6,8 @@ const updateController = require('../controllers/update.controller');
 const ticketController = require('../controllers/ticket.controller');
 const validator = require('../utils/validateToken');
 const {isAdmin} = require('../utils/isAdmin');
+const validateTicket = require('../utils/validateTicketStatus');
+const {validateStatus} = require('../utils/validateStatus');
 
 module.exports = function(router){
     //verifySignup.validateSignupRequest
@@ -24,7 +26,12 @@ module.exports = function(router){
 
     router.put("/crm/api/v1/users/:userId", validator.verifyToken, isAdmin, updateController.update);
 
-    router.post("/crm/api/v1/tickets", validator.verifyToken, ticketController.createTicket);
+    router.post("/crm/api/v1/tickets", validator.verifyToken, validateTicket.validateTicketRequestBody, ticketController.createTicket);
 
+    router.get("/crm/api/v1/tickets", validator.verifyToken, ticketController.getAllTickets);
+
+    router.get("/crm/api/v1/tickets/:id", validator.verifyToken, ticketController.getTicketById);
+
+    router.put("/crm/api/v1/tickets/:id", validator.verifyToken, validateStatus, ticketController.updateTicket);
 }
 

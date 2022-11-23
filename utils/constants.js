@@ -9,3 +9,10 @@ exports.userStatus = {
     pending: 'PENDING',
     rejected: 'REJECTED'
 }
+
+exports.ticketStatus = {
+    open: 'OPEN',
+    closed: 'CLOSED',
+    inprogress: 'IN-PROGRESS',
+    blocked: 'BLOCKED'
+}

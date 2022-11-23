@@ -4,19 +4,6 @@ const {userTypes, userStatus} = require('../utils/constants')
 const objectConvertor = require('../utils/objectConvertor')
 
 exports.createTicket = async (req,res) => {
-    // validate title
-    if(!req.body.title){
-        return res.status(400).send({
-            message: 'Title not found'
-        })
-    }
-
-    // validate description
-    if(!req.body.description){
-        return res.status(400).send({
-            message: 'Description not found'
-        })
-    }
 
     // rest of work
     var ticketObject = {
@@ -71,5 +58,84 @@ exports.createTicket = async (req,res) => {
         res.status(500).send({
             message: 'Error in creating ticket'
         });
+    }
+}
+
+exports.getAllTickets = async (req, res) => {
+    let user;
+    try {
+        user = await User.findOne({userId: req.userId}).exec();
+    } catch (error) {
+        res.status(500).send({
+            message: 'Internal server error'
+        })
+    }
+
+    let queryObject = {};
+    if(req.query.status){
+        // Validate status value before setting it as filter
+        queryObject.status = req.query.status
+    }
+
+    if(user.userType == 'ENGINEER'){
+        queryObject.assignee = req.userId;
+    }
+    else if(user.userType == 'CUSTOMER'){
+        queryObject.reporter = req.userId;
+    }
+
+    let tickets;
+    try {
+        tickets = await Ticket.find(queryObject).exec();
+    } catch (error) {
+        res.status(500).send({
+            message: 'Internal server error'
+        })
+    }
+
+    res.status(200).send(objectConvertor.ticketListConvertor(tickets));
+}
+
+exports.getTicketById = async (req, res) => {
+    try {
+        const ticket = await Ticket.findOne({
+            _id: req.params.id
+        }).exec();
+
+        res.status(200).send(objectConvertor.ticketConvertor(ticket));
+    } catch (error) {
+        res.status(500).send({
+            message: 'Internal server error'
+        })
+    }
+}
+
+exports.updateTicket = async(req, res) => {
+    try {
+        const ticket = await Ticket.findOne({_id:req.params.id}).exec();
+
+        const user = await User.findOne({userId: req.userId}).exec();
+
+        if(
+            user.userType == "ADMIN" ||
+            ticket.assignee == req.userId ||
+            ticket.reporter == req.userId
+        ){
+            // Update ticket
+            ticket.status = req.body.status != undefined ? req.body.status : ticket.status;
+
+            const updatedTicket = await ticket.save();
+
+            res.status(200).send(updatedTicket);
+        }
+        else {
+            return res.status(401).send({
+                message: 'User is not authorized for update to the ticket'
+            })
+        }
+    } catch (error) {
+        return res.status(500).send({
+            message: 'Internal server error'
+        })
     }
 }
