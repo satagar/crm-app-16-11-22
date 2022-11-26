@@ -2,6 +2,7 @@ const Ticket = require('../models/ticket.model');
 const User = require('../models/user.model');
 const {userTypes, userStatus} = require('../utils/constants')
 const objectConvertor = require('../utils/objectConvertor')
+const sendEmail = require('../utils/NotificationClient');
 
 exports.createTicket = async (req,res) => {
 
@@ -51,6 +52,17 @@ exports.createTicket = async (req,res) => {
                 engineer.ticketsAssigned = [ticket._id];
             }
             engineer.save();
+
+            /**
+             * Send email on success
+             */
+            sendEmail(
+                ticket._id, 
+                `Ticket with id:${ticket._id} created`,
+                ticket.description,
+                [customer.email, engineer.email].toString(),
+                'CRM app'
+            )
 
             res.status(201).send(objectConvertor.ticketConvertor(ticket));
         }
@@ -125,6 +137,17 @@ exports.updateTicket = async(req, res) => {
             ticket.status = req.body.status != undefined ? req.body.status : ticket.status;
 
             const updatedTicket = await ticket.save();
+
+            /**
+             * Send email on success
+             */
+             sendEmail(
+                ticket._id, 
+                `Ticket with id:${ticket._id} created`,
+                ticket.description,
+                [ticket.reporter, engineer.assignee].toString(),
+                'CRM app'
+            )
 
             res.status(200).send(updatedTicket);
         }
